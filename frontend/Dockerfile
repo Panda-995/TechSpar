@@ -12,6 +12,8 @@ COPY packages/testing/package.json packages/testing/package.json
 COPY frontend/package.json frontend/package.json
 RUN bun install --frozen-lockfile --filter frontend
 COPY frontend frontend
+# fork 补丁: 上游 Dockerfile 未拷贝 packages/ 源码, @techspar/contracts 的 exports 解析会失败
+COPY packages packages
 RUN bun run --cwd frontend build
 
 FROM nginx:alpine
