@@ -12,10 +12,6 @@ on:
     paths-ignore:
       - '**.md'
 
-env:
-  IMAGE_API: ghcr.io/panda-995/techspar-api
-  IMAGE_WEB: ghcr.io/panda-995/techspar-web
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,21 +39,13 @@ jobs:
           TAGS_API="ghcr.io/panda-995/techspar-api:latest"
           TAGS_WEB="ghcr.io/panda-995/techspar-web:latest"
           if [ -n "$VERSION" ]; then
-            TAGS_API="$TAGS_API
-ghcr.io/panda-995/techspar-api:${VERSION}"
-            TAGS_WEB="$TAGS_WEB
-ghcr.io/panda-995/techspar-web:${VERSION}"
+            TAGS_API=$(printf '%s\n%s' "$TAGS_API" "ghcr.io/panda-995/techspar-api:${VERSION}")
+            TAGS_WEB=$(printf '%s\n%s' "$TAGS_WEB" "ghcr.io/panda-995/techspar-web:${VERSION}")
           fi
-          {
-            echo "tags_api<<EOF"
-            echo "$TAGS_API"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-          {
-            echo "tags_web<<EOF"
-            echo "$TAGS_WEB"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          printf '%s\n%s\n%s\n' "tags_api<<EOF" "$TAGS_API" "EOF" >> "$GITHUB_OUTPUT"
+          printf '%s\n%s\n%s\n' "tags_web<<EOF" "$TAGS_WEB" "EOF" >> "$GITHUB_OUTPUT"
+          echo "API tags: $TAGS_API"
+          echo "WEB tags: $TAGS_WEB"
 
       - name: 构建并推送 API 镜像
         uses: docker/build-push-action@v6
